@@ -6,10 +6,22 @@ metadata:
 spec:
   ports:
   - port: 80
-    targetPort: 9898 # Must match below
+    targetPort: 9898 # The Service sends traffic here
     name: http-frontend
 ---
-
+# DEPLOYMENT
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  template:
+    spec:
+      containers:
+      - name: frontend
+        image: stefanprodan/podinfo:latest
+        ports:
+        - containerPort: 9898 # This MUST exist and match the targetPort
 ---
 # SERVICE
 apiVersion: v1
@@ -19,79 +31,19 @@ metadata:
 spec:
   ports:
   - port: 80
-    targetPort: 8080 # Must match below
+    targetPort: 8080 
     name: http-backend
 ---
-# FRONTEND
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: frontend
-  namespace: istio-lab
-spec:
-  replicas: 1
-  # SELECTOR: This tells the deployment which pods to manage
-  selector:
-    matchLabels:
-      app: frontend
-  template:
-    metadata:
-      # LABELS: These MUST match the selector above
-      labels:
-        app: frontend
-    spec:
-      containers:
-      - name: frontend
-        image: stefanprodan/podinfo:latest
-        ports:
-        - containerPort: 9898
-
----
-# BACKEND VERSION 1
+# DEPLOYMENT
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-v1
-  namespace: istio-lab
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: backend
-      version: v1
   template:
-    metadata:
-      labels:
-        app: backend
-        version: v1
     spec:
       containers:
       - name: backend
         image: mccutchen/go-httpbin:latest
         ports:
-        - containerPort: 8080
-
----
-# BACKEND VERSION 2
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: backend-v2
-  namespace: istio-lab
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: backend
-      version: v2
-  template:
-    metadata:
-      labels:
-        app: backend
-        version: v2
-    spec:
-      containers:
-      - name: backend
-        image: mccutchen/go-httpbin:latest
-        ports:
-        - containerPort: 8080
+        - containerPort: 8080 # This line resolves KIA0701 for the backend

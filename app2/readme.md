@@ -13,3 +13,9 @@ kubectl patch svc frontend-svc -n istio-lab --type='json' -p='[
   {"op": "replace", "path": "/spec/ports/0/nodePort", "value": 30012}
 ]'
 ```
+
+```bash
+ kubectl patch svc gateway-istio -n istio-lab --type='json' -p='[
+  {"op": "replace", "path": "/spec/type", "value": "NodePort"},
+  {"op": "replace", "path": "/spec/ports/1/nodePort", "value": 30010}
+```
