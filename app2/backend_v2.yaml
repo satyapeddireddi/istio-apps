@@ -19,6 +19,6 @@ spec:
     spec:
       containers:
       - name: backend
-        image: mccutchen/go-httpbin:latest
+        image: ghcr.io/stefanprodan/podinfo:6.3.5
         ports:
         - containerPort: 8080
