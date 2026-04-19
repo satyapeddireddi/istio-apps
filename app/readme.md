@@ -41,20 +41,25 @@ while true; do
   curl -s http://172.29.8.197:30008/ | grep -E "message|version"
   sleep 0.2
 done
-
+```
 or
-
+```bash
 while true; do    curl -s -o /dev/null -w "%{http_code} - %{time_total}s\n" http://172.29.8.197:30008/;   sleep 0.2; done
 
 ```
+```bash
 istioctl install --set meshConfig.enableTracing=true \
 --set meshConfig.defaultConfig.tracing.sampling=100.0 \
 --set meshConfig.defaultConfig.tracing.zipkin.address=jaeger-collector.istio-system:9411
-
+```
+```bash
 kubectl exec -it jaeger-8489dc7cd5-bst7x -n istio-system -- netstat -tuln | grep 9411
-
+```
+```bash
 kubectl get endpoints zipkin -n istio-system
-
+```
+```bash
 kubectl rollout restart deployment istio-ingressgateway -n istio-system
 kubectl rollout restart deployment podinfo -n app
 kubectl rollout restart deployment podinfo-v2 -n app
+```
