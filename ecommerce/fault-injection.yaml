@@ -1,0 +1,44 @@
+# cat <<EOF | kubectl apply -f -
+# apiVersion: networking.istio.io/v1alpha3
+# kind: VirtualService
+# metadata:
+#   name: productcatalog-delay
+#   namespace: ecom
+# spec:
+#   hosts:
+#   - productcatalogservice
+#   http:
+#   - fault:
+#       delay:
+#         percentage:
+#           value: 100.0
+#         fixedDelay: 5s
+#     route:
+#     - destination:
+#         host: productcatalogservice
+# EOF
+
+# Since you are a DevOps Engineer, the best way to test Istio is to break something. 
+# Try creating a Fault Injection to see how it looks in Jaeger.
+# Run this to make the "Product Catalog" slow (5-second delay):
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: productcatalog-delay
+  namespace: ecom
+spec:
+  hosts:
+  - productcatalogservice
+  http:
+  - fault:
+      delay:
+        percentage:
+          value: 100.0
+        fixedDelay: 5s
+    route:
+    - destination:
+        host: productcatalogservice
+
+# Now refresh the UI. The page will hang for 5 seconds. If you check Jaeger, 
+# you will see a massive 5-second "gap" in the trace, highlighting exactly where the bottleneck is.
