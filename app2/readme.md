@@ -20,6 +20,11 @@ kubectl patch svc gateway-istio -n istio-lab --type='json' -p='[
 ]'
 ```
 ```bash
+if its not wokring use annotations 
+
+kubectl annotate gateway gateway-istio  -n istio-lab "networking.istio.io/service-type=NodePort" --overwrite
+```
+```bash
 # Replace 172.29.8.197 with your actual Node IP
 while true; do 
   curl -s -o /dev/null -w "Status: %{http_code} | Time: %{time_total}s\n" http://172.29.8.197:30012/
