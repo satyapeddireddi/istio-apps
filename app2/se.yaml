@@ -1,0 +1,18 @@
+
+# If your backend needs to talk to a service outside the mesh (e.g., a public API),
+#  you must define a ServiceEntry.
+
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: external-api-entry
+  namespace: istio-lab
+spec:
+  hosts:
+  - api.external-service.com
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  resolution: DNS
+  location: MESH_EXTERNAL
