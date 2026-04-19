@@ -7,7 +7,7 @@ metadata:
     # This tells the Istio Gateway controller to create a NodePort service
     networking.istio.io/service-type: NodePort
 spec:
-  gatewayClassName: gateway-istio
+  gatewayClassName: istio
   listeners:
   - name: http
     port: 80
