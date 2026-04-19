@@ -3,6 +3,9 @@ kind: Gateway
 metadata:
   name: gateway
   namespace: istio-lab
+  annotations:
+    # This tells the Istio Gateway controller to create a NodePort service
+    networking.istio.io/service-type: NodePort
 spec:
   gatewayClassName: istio
   listeners:

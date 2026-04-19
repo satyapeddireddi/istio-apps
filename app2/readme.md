@@ -65,5 +65,9 @@ google.com                                                           443       -
 hashicorp.com                                                        443       -          outbound      STRICT_DNS       
 ```
 
+```bash
+istioctl pc endpoint $(kubectl get pod -l app=frontend -n istio-lab -o jsonpath='{.items[0].metadata.name}') -n istio-lab --cluster "outbound|80||backend-svc.istio-lab.svc.cluster.local"
+```
+
 
 
