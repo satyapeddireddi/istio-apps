@@ -9,7 +9,7 @@ metadata:
   namespace: istio-lab
 spec:
   parentRefs:
-  - name: gateway
+  - name: gateway-istio
     namespace: istio-lab
   rules:
   - matches:
