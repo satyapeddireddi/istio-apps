@@ -9,19 +9,6 @@ spec:
     targetPort: 9898 # Must match below
     name: http-frontend
 ---
-# DEPLOYMENT
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: frontend
-spec:
-  template:
-    spec:
-      containers:
-      - name: frontend
-        image: stefanprodan/podinfo:latest
-        ports:
-        - containerPort: 9898 # Match found!
 
 ---
 # SERVICE
@@ -35,16 +22,76 @@ spec:
     targetPort: 8080 # Must match below
     name: http-backend
 ---
-# DEPLOYMENT
+# FRONTEND
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-v1 # Repeat for v2
+  name: frontend
+  namespace: istio-lab
 spec:
+  replicas: 1
+  # SELECTOR: This tells the deployment which pods to manage
+  selector:
+    matchLabels:
+      app: frontend
   template:
+    metadata:
+      # LABELS: These MUST match the selector above
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: stefanprodan/podinfo:latest
+        ports:
+        - containerPort: 9898
+
+---
+# BACKEND VERSION 1
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-v1
+  namespace: istio-lab
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: backend
+        version: v1
     spec:
       containers:
       - name: backend
         image: mccutchen/go-httpbin:latest
         ports:
-        - containerPort: 8080 # Match found!
+        - containerPort: 8080
+
+---
+# BACKEND VERSION 2
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-v2
+  namespace: istio-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: backend
+        version: v2
+    spec:
+      containers:
+      - name: backend
+        image: mccutchen/go-httpbin:latest
+        ports:
+        - containerPort: 8080
