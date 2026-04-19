@@ -8,7 +8,6 @@ spec:
   - port: 80
     targetPort: 9898 # Must match below
     name: http-frontend
----
 
 ---
 # SERVICE
@@ -21,8 +20,9 @@ spec:
   - port: 80
     targetPort: 8080 # Must match below
     name: http-backend
+
 ---
-# FRONTEND
+# 1. FRONTEND: Deployment & Service
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -30,13 +30,11 @@ metadata:
   namespace: istio-lab
 spec:
   replicas: 1
-  # SELECTOR: This tells the deployment which pods to manage
   selector:
     matchLabels:
       app: frontend
   template:
     metadata:
-      # LABELS: These MUST match the selector above
       labels:
         app: frontend
     spec:
@@ -44,10 +42,43 @@ spec:
       - name: frontend
         image: stefanprodan/podinfo:latest
         ports:
-        - containerPort: 9898
+        - containerPort: 9898 # Explicitly declared for KIA0701
+        env:
+        - name: PODINFO_BACKEND_URL
+          value: "http://backend-svc:80" # This enables the Frontend -> Backend arrow
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-svc
+  namespace: istio-lab
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 9898
+    nodePort: 30012
+    name: http-frontend # Explicitly named for KIA0601
+  selector:
+    app: frontend
 
 ---
-# BACKEND VERSION 1
+# 2. BACKEND: Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  namespace: istio-lab
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: http-backend
+  selector:
+    app: backend
+
+---
+# 3. BACKEND: Version 1 Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -69,10 +100,9 @@ spec:
       - name: backend
         image: mccutchen/go-httpbin:latest
         ports:
-        - containerPort: 8080
-
+        - containerPort: 8080 # Explicitly declared for KIA0701
 ---
-# BACKEND VERSION 2
+# 4. BACKEND: Version 2 Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
