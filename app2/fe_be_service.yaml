@@ -1,22 +1,22 @@
-# SERVICE
-apiVersion: v1
-kind: Service
-metadata:
-  name: frontend-svc
-spec:
-  ports:
-  - port: 80
-    targetPort: 9898 # Must match below
-    name: http-frontend
+# # SERVICE
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: frontend-svc
+# spec:
+#   ports:
+#   - port: 80
+#     targetPort: 9898 # Must match below
+#     name: http-frontend
 
----
-# SERVICE
-apiVersion: v1
-kind: Service
-metadata:
-  name: backend-svc
-spec:
-  ports:
-  - port: 80
-    targetPort: 8080 # Must match below
-    name: http-backend
+# ---
+# # SERVICE
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: backend-svc
+# spec:
+#   ports:
+#   - port: 80
+#     targetPort: 8080 # Must match below
+#     name: http-backend
