@@ -1,0 +1,15 @@
+---
+# 2. BACKEND: Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  namespace: istio-lab
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: http-backend
+  selector:
+    app: backend
+

@@ -1,0 +1,25 @@
+---
+# 1. FRONTEND: Deployment & Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: istio-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: stefanprodan/podinfo:latest
+        ports:
+        - containerPort: 9898 # Explicitly declared for KIA0701
+        env:
+        - name: PODINFO_BACKEND_URL
+          value: "http://backend-svc:80" # This enables the Frontend -> Backend arrow

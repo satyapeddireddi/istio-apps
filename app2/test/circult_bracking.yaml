@@ -1,0 +1,60 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: backend-cb
+  namespace: istio-lab
+spec:
+  host: backend-svc.istio-lab.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      http:
+        http1MaxPendingRequests: 1    # Max pending requests
+        maxRequestsPerConnection: 1   # Max requests per connection
+    outlierDetection:
+      consecutive5xxErrors: 1         # Eject after 1 error
+      interval: 1s                    # Check every second
+      baseEjectionTime: 3m            # Stay out for 3 mins
+      maxEjectionPercent: 100         # Can eject all pods
+
+# 2. How to Check (Validation Steps)
+# A. Validate the Outlier Detection (Ejection)
+# This test proves that if a pod returns an error, Istio will "kick it out" of the load-balancing pool.
+
+# Induce Failure: Exec into one of your backend-v1 pods and make it return a 500 error (or just stop the app process if possible).
+
+# Send Traffic:
+
+# kubectl exec -it frontend-58cdd886f5-2fnv8 -n istio-lab -- curl -I http://backend-svc/status/500
+
+#----------------------------------------------
+
+# Check Kiali: Look at the Graph. The arrow to that specific pod will turn Red, and then the pod icon will eventually show a "restricted" symbol or the traffic will stop hitting it entirely.
+
+# B. Validate Connection Pooling (Circuit Breaking)
+# This test proves that Istio blocks traffic when there are too many concurrent requests. We will use a tool called Fortio (or just multiple parallel curls) to overwhelm the service.
+
+# Run this "Load Test" from the frontend:
+
+# Bash
+
+
+# This sends 10 concurrent connections (-c 10)
+# Since we set http1MaxPendingRequests to 1, most should fail.
+
+#kubectl exec -it frontend-58cdd886f5-2fnv8 -n istio-lab -- fortio load -c 10 -n 100 -qps 0 http://backend-svc:80/status/200
+
+# What to look for: In the output, you will see a high percentage of 503 Service Unavailable errors.
+
+# The "Proof": Check the response headers for x-envoy-overloaded: true. This confirms it was the Circuit Breaker (Envoy) that dropped the request, not the application itself.
+# ------------------------------
+# 3. Verification via istioctl
+# You can see the circuit breaker counters in real-time on the sidecar's statistics.
+#
+#  istioctl dashboard envoy frontend-58cdd886f5-2fnv8.istio-lab
+
+
+# (Navigate to the stats tab and search for pending_overflow or outlier_detection.)
+
+# Alternatively, use the CLI:
+
+#istioctl pc endpoint frontend-58cdd886f5-2fnv8 -n istio-lab --cluster "outbound|80||backend-svc.istio-lab.svc.cluster.local"
