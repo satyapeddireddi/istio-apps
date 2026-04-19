@@ -26,10 +26,15 @@ kubectl annotate gateway gateway-istio  -n istio-lab "networking.istio.io/servic
 ```
 ```bash
 # Replace 172.29.8.197 with your actual Node IP
+1. The "Kiali Activator" (While Loop)
+Run this command in your terminal. It tells the frontend pod to repeatedly request data from the backend. This will "light up" the path in Kiali.
+
 while true; do 
-  curl -s -o /dev/null -w "Status: %{http_code} | Time: %{time_total}s\n" http://172.29.8.197:30012/
-  sleep 0.5
+  kubectl exec -it $(kubectl get pod -l app=frontend -n istio-lab -o jsonpath='{.items[0].metadata.name}') -n istio-lab -- curl -s -o /dev/null http://backend-svc.istio-lab.svc.cluster.local/status/200
+  echo "Traffic pulse sent to backend..."
+  sleep 1
 done
+
 ```
 ```bash
 # 1. Get a Backend Pod IP
@@ -72,6 +77,18 @@ hashicorp.com                                                        443       -
 
 ```bash
 istioctl pc endpoint $(kubectl get pod -l app=frontend -n istio-lab -o jsonpath='{.items[0].metadata.name}') -n istio-lab --cluster "outbound|80||backend-svc.istio-lab.svc.cluster.local"
+```
+
+
+```bash
+3. Verify the "Service Entry" for External Validation
+If you are also testing a ServiceEntry (like the google.com test we discussed), run this alongside the other loop:
+
+while true; do 
+  kubectl exec -it $(kubectl get pod -l app=frontend -n istio-lab -o jsonpath='{.items[0].metadata.name}') -n istio-lab -- curl -s -o /dev/null https://google.com
+  sleep 2
+done
+
 ```
 
 
