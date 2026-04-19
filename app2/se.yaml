@@ -9,6 +9,7 @@ metadata:
   namespace: istio-lab
 spec:
   hosts:
+  - google
   - api.external-service.com
   ports:
   - number: 443

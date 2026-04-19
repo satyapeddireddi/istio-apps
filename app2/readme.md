@@ -26,3 +26,37 @@ while true; do
   sleep 0.5
 done
 ```
+```bash
+# 1. Get a Backend Pod IP
+BACKEND_IP=$(kubectl get pod -l app=backend,version=v1 -n istio-lab -o jsonpath='{.items[0].status.podIP}')
+
+# 2. Try to curl it from the Frontend
+kubectl exec -it $(kubectl get pod -l app=frontend -n istio-lab -o jsonpath='{.items[0].metadata.name}') -n istio-lab -- curl -I http://$BACKEND_IP:8080/status/200
+HTTP/1.1 200 OK
+access-control-allow-credentials: true
+access-control-allow-origin: *
+content-type: text/plain; charset=utf-8
+date: Sun, 19 Apr 2026 09:36:18 GMT
+x-envoy-upstream-service-time: 1
+server: istio-envoy
+x-envoy-decorator-operation: backend-svc.istio-lab.svc.cluster.local:80/*
+transfer-encoding: chunked
+```
+```bash
+for i in {1..20}; do 
+  kubectl exec -it $(kubectl get pod -l app=frontend -n istio-lab -o jsonpath='{.items[0].metadata.name}') -n istio-lab -- curl -s -o /dev/null http://backend-svc.istio-lab.svc.cluster.local/status/200
+  echo "Traffic pulse $i sent..."
+done
+```
+or
+
+```bash
+while true; do 
+  kubectl exec -it $(kubectl get pod -l app=frontend -n istio-lab -o jsonpath='{.items[0].metadata.name}') -n istio-lab -- curl -s -o /dev/null -w "Connect to Backend: %{http_code}\n" http://backend-svc.istio-lab.svc.cluster.local/status/200
+  sleep 0.5
+done
+```
+
+```bash
+service entry test
+
