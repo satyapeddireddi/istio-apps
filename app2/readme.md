@@ -59,4 +59,11 @@ done
 
 ```bash
 service entry test
+[root@LAPTOP-AV0J9JU7 app2]# istioctl pc clusters frontend-58cdd886f5-2fnv8 -n istio-lab | grep google.com
+google.com                                                           443       -          outbound      STRICT_DNS       
+[root@LAPTOP-AV0J9JU7 app2]# istioctl pc clusters frontend-58cdd886f5-2fnv8 -n istio-lab | grep hashicorp.com
+hashicorp.com                                                        443       -          outbound      STRICT_DNS       
+```
+
+
 
