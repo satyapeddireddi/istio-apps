@@ -20,6 +20,6 @@ spec:
       containers:
       - name: backend
         image: ghcr.io/stefanprodan/podinfo:6.11.2
-        image: mccutchen/go-httpbin:latest
+      #  image: mccutchen/go-httpbin:latest
         ports:
         - containerPort: 8080 # Explicitly declared for KIA0701
